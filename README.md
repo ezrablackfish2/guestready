@@ -1,5 +1,6 @@
 # Airbnb Clone - Microservices Architecture
 
+
 A comprehensive Airbnb Dev built using microservices architecture with modern technologies. This project demonstrates scalable, distributed system design with separate services for authentication, booking management, hotel management, and notifications.
 
 ## Architecture Diagram
