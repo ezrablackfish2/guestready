@@ -1,157 +1,589 @@
-# Allbirds – Sustainable E-Commerce Platform
+# GuestReady – Hospitality Booking & Property Management Platform
 
-Allbirds is a full-stack e-commerce platform inspired by the premium shopping experience of the Allbirds footwear and apparel brand.
+GuestReady is a scalable hospitality booking and property-management platform inspired by modern short-term and mid-term rental services.
 
-The project recreates the clean, minimalist, product-focused experience of a modern direct-to-consumer e-commerce website while combining a polished storefront with a powerful content management system, product catalog, shopping experience, secure payments, and administrative tools.
+The project is designed around a **microservices architecture**, separating authentication, accommodation management, bookings, notifications, and customer reviews into independent services that can be developed, deployed, monitored, and scaled separately.
 
-The application focuses on sustainable footwear, apparel, and accessories, presenting products through large lifestyle imagery, simple navigation, spacious layouts, product variants, detailed product pages, and brand storytelling.
+Rather than functioning as a simple property-listing application, the platform demonstrates the backend infrastructure required to operate a modern accommodation marketplace where guests can discover properties, create bookings, manage reservations, receive notifications, and review completed stays.
+
+Property and platform administrators can manage hotels, rooms, room categories, users, permissions, bookings, and associated operational data through dedicated APIs.
 
 ## Overview
 
-The platform allows customers to explore men's and women's products, browse collections, discover new arrivals and best sellers, view detailed product information, select product variants, manage their shopping cart, and securely complete purchases online.
+The system consists of five primary microservices:
 
-Beyond the customer-facing storefront, the project includes a headless CMS architecture that allows administrators to manage products, categories, media, pages, SEO metadata, users, orders, and other application content without modifying the source code.
+* **Authentication Service**
+* **Booking Service**
+* **Hotel & Property Service**
+* **Notification Service**
+* **Review & Rating Service**
 
-The result is a complete modern e-commerce system combining frontend design, backend content management, database persistence, payments, and administrative functionality.
+Each service owns a specific part of the application's business logic and communicates with other services through REST APIs and asynchronous messaging.
 
-## Core Features
+This separation allows individual components to scale independently while keeping the overall platform modular, maintainable, fault-tolerant, and easier to extend.
 
-* **Modern E-Commerce Storefront** – Clean and responsive shopping experience inspired by Allbirds' minimalist design language.
+---
 
-* **Product Catalog** – Browse footwear, apparel, accessories, new arrivals, best sellers, and curated collections.
+# Core Features
 
-* **Product Detail Pages** – Detailed product pages containing images, descriptions, pricing, available options, product information, and purchasing controls.
+## 🔐 Authentication & User Management
 
-* **Product Variants** – Support for different sizes, colors, styles, and product configurations.
+The authentication service is built in Go and handles identity, account security, authorization, and protected access throughout the platform.
 
-* **Shopping Cart** – Add products, modify quantities, remove items, and review purchases before checkout.
+### Features
 
-* **Secure Checkout** – Integrated payment processing for completing online purchases.
+* User registration
+* User login
+* JWT authentication
+* Password hashing with bcrypt
+* Protected profile endpoints
+* Request validation
+* Rate limiting
+* Database connection management
+* Role-based access control
+* Permission-based authorization
+* Automatic default role assignment
+* OTP email verification
+* Password-reset OTP support
+* Service proxying
+* Standardized API responses
+* Health checks
 
-* **Stripe Integration** – Handles payment processing and e-commerce transaction workflows.
+### OTP Verification
 
-* **Customer Accounts** – Authentication and user account functionality for personalized shopping experiences.
+The platform includes a secure OTP system for account verification and password-related operations.
 
-* **Order Management** – Manage customer purchases and associated order information.
+Features include:
 
-* **Category & Collection Browsing** – Organize products into structured categories and curated collections.
+* Cryptographically generated 6-digit OTP codes
+* OTP expiration
+* Single-use verification codes
+* Automatic cleanup
+* Email verification
+* Password-reset support
+* Rate limiting
+* Input validation
+* Integration with the Notification Service
 
-* **Men's & Women's Shopping** – Dedicated navigation and product discovery experiences.
+---
 
-* **New Arrivals & Best Sellers** – Highlight recently released and popular products.
+# 🛡️ Role-Based Access Control
 
-* **Responsive Design** – Optimized for desktop, tablet, and mobile devices.
+The authentication system implements granular role and permission management.
 
-* **Rich Product Media** – Support for high-quality product imagery and visual merchandising.
+The platform can support roles such as:
 
-* **Content Management System** – Administrators can control site content through Payload CMS.
+* Guest
+* User
+* Property Manager
+* Administrator
 
-* **Admin Dashboard** – Central interface for managing products, customers, orders, content, and media.
+Permissions can be assigned to roles and roles can be assigned to individual users.
 
-* **Media Management** – Upload and organize product photography and website assets.
+This makes it possible to protect sensitive platform operations and expose functionality according to the responsibilities of each user.
 
-* **SEO Management** – Manage metadata and search-engine optimization information for site content.
+---
 
-* **Dynamic Pages** – CMS-driven page creation and content management.
+# 🏨 Property & Hotel Management
 
-* **Nested Content Structure** – Supports organized category and content hierarchies.
+The Hotel Service manages accommodations, rooms, availability, categories, ratings, and related property information.
 
-* **Redirect Management** – Configure application redirects through the CMS.
+### Features
 
-* **Database Persistence** – Product, customer, order, and CMS data are stored using MongoDB.
+* Create properties
+* Retrieve property information
+* Update properties
+* Soft-delete properties
+* Search properties
+* Filter properties
+* Manage rooms
+* Manage room categories
+* Track room availability
+* Store room pricing
+* Property rating support
+* Database migrations
+* Repository-pattern architecture
+* Request validation
+* Error handling
+* Structured logging
+* Correlation ID tracking
 
-* **Docker Support** – Containerized environment for consistent local development and deployment.
+The service uses soft deletes to preserve historical data rather than permanently removing property records.
 
-## Design
+---
 
-The user interface follows the visual philosophy associated with premium direct-to-consumer brands:
+# 🛏️ Room Management
 
-* Large lifestyle photography
-* Minimalist typography
-* Generous whitespace
-* Strong product imagery
-* Simple navigation
-* Clear calls to action
-* Product-focused layouts
-* Clean collection pages
-* Modern product grids
-* Brand storytelling
-* Mobile-first responsive behavior
+Properties can contain multiple rooms and room categories.
 
-Rather than overwhelming users with dense interfaces, the design places emphasis on products, photography, usability, and a smooth path from discovery to checkout.
+Room information can include:
 
-## Sustainability-Focused Experience
+* Property association
+* Room category
+* Availability date
+* Price
+* Booking association
 
-The storefront is inspired by Allbirds' emphasis on natural and lower-impact materials such as Merino wool, tree fiber, and sugarcane.
+This structure allows the booking system to track accommodation inventory independently from the core property information.
 
-The website combines commerce with storytelling, allowing sustainability, materials, product design, and company philosophy to become part of the overall shopping experience rather than treating the platform as a simple product catalog.
+---
 
-## Tech Stack
+# 📅 Booking Management
 
-### Frontend
+The Booking Service manages the complete reservation lifecycle.
 
-* Next.js 13
-* React 18
+### Features
+
+* Create bookings
+* Confirm bookings
+* Cancel bookings
+* Booking-status management
+* Pending reservations
+* Confirmed reservations
+* Cancelled reservations
+* Database transactions
+* Idempotent booking operations
+* Distributed locking
+* Asynchronous notifications
+* Request validation
+* Correlation ID tracking
+* Structured logging
+* Comprehensive error handling
+
+---
+
+# 🔒 Distributed Booking Protection
+
+Booking systems must handle situations where multiple customers attempt to reserve the same resource simultaneously.
+
+This project uses **Redis and Redlock-based distributed locking** to prevent race conditions during booking operations.
+
+Distributed locks ensure that critical booking resources cannot be modified concurrently in ways that could produce inconsistent reservation data.
+
+This architecture is particularly important when multiple instances of the Booking Service are running simultaneously.
+
+---
+
+# 🔁 Idempotent Reservations
+
+Booking confirmation operations support idempotency keys.
+
+Each booking can be associated with a unique identifier that prevents accidental duplicate operations caused by:
+
+* Network retries
+* Repeated requests
+* Client-side resubmissions
+* Service communication failures
+
+This makes reservation processing more reliable and closer to the architecture expected from production booking systems.
+
+---
+
+# ⭐ Reviews & Ratings
+
+The Review Service is implemented in Go and manages guest feedback associated with properties and completed bookings.
+
+### Features
+
+* Create reviews
+* Retrieve all reviews
+* Retrieve individual reviews
+* Rating validation
+* User association
+* Property association
+* Booking association
+* Structured API responses
+* Data integrity validation
+
+A review can be associated with a specific:
+
+* User
+* Property
+* Booking
+* Rating
+* Comment
+
+This creates a foundation for verified-stay review systems.
+
+---
+
+# 📧 Notification Service
+
+The Notification Service handles asynchronous customer communication.
+
+### Features
+
+* Email notifications
+* Welcome emails
+* Booking-confirmation emails
+* Template-based messaging
+* Background processing
+* Redis queues
+* Queue workers
+* Email-job processing
+* Error handling
+* Structured logging
+* Health monitoring
+
+Emails are generated using reusable Handlebars templates and delivered through Nodemailer.
+
+---
+
+# ⚡ Asynchronous Processing
+
+Operations that do not need to block the main HTTP request are processed asynchronously.
+
+The project uses:
+
+* **Redis**
+* **BullMQ**
+* **Background workers**
+
+for queue-driven processing.
+
+For example, a booking can be completed immediately while its confirmation email is placed into a background queue.
+
+This architecture improves:
+
+* API responsiveness
+* Scalability
+* Reliability
+* Failure recovery
+* Service isolation
+
+---
+
+# 🔄 Microservices Communication
+
+Services communicate using two primary mechanisms.
+
+## Synchronous Communication
+
+REST APIs are used when one service requires an immediate response from another service.
+
+## Asynchronous Communication
+
+Redis and BullMQ queues are used for operations that can be processed independently, such as email notifications.
+
+Correlation IDs are propagated through requests to make it easier to trace operations across multiple services.
+
+---
+
+# 🏗️ Architecture
+
+```text
+                        ┌──────────────────────┐
+                        │       Client         │
+                        └──────────┬───────────┘
+                                   │
+                                   ▼
+                        ┌──────────────────────┐
+                        │   Auth Service       │
+                        │       Go             │
+                        └──────┬────────┬──────┘
+                               │        │
+                  ┌────────────┘        └────────────┐
+                  ▼                                  ▼
+        ┌──────────────────┐              ┌──────────────────┐
+        │  Hotel Service   │              │ Booking Service  │
+        │ Node/TypeScript  │              │ Node/TypeScript  │
+        └────────┬─────────┘              └────────┬─────────┘
+                 │                                 │
+                 │                                 ▼
+                 │                       ┌──────────────────┐
+                 │                       │      Redis       │
+                 │                       │ Queues / Locks   │
+                 │                       └────────┬─────────┘
+                 │                                │
+                 ▼                                ▼
+        ┌──────────────────┐             ┌────────────────────┐
+        │  Review Service  │             │Notification Service│
+        │        Go        │             │  Node/TypeScript   │
+        └──────────────────┘             └────────────────────┘
+
+                         ┌─────────────────┐
+                         │      MySQL      │
+                         │ Persistent Data │
+                         └─────────────────┘
+```
+
+---
+
+# 🧩 Microservices
+
+## AuthInGo
+
+**Language:** Go
+
+Responsible for:
+
+* Authentication
+* User accounts
+* JWT tokens
+* OTP verification
+* Authorization
+* Roles
+* Permissions
+* Security middleware
+* Service proxying
+
+---
+
+## BookingService
+
+**Language:** TypeScript
+**Framework:** Express.js
+
+Responsible for:
+
+* Reservation creation
+* Reservation confirmation
+* Reservation cancellation
+* Booking status
+* Idempotency
+* Database transactions
+* Redis locking
+* Background jobs
+
+---
+
+## HotelService
+
+**Language:** TypeScript
+**Framework:** Express.js
+
+Responsible for:
+
+* Properties
+* Hotels
+* Rooms
+* Room categories
+* Availability
+* Pricing
+* Ratings
+* Property search
+* Property management
+
+---
+
+## NotificationService
+
+**Language:** TypeScript
+**Framework:** Express.js
+
+Responsible for:
+
+* Email delivery
+* Email templates
+* Booking notifications
+* Welcome emails
+* Background jobs
+* Queue processing
+
+---
+
+## ReviewService
+
+**Language:** Go
+
+Responsible for:
+
+* Guest reviews
+* Property ratings
+* Booking-linked reviews
+* Review retrieval
+* Review validation
+
+---
+
+# 🛠️ Technology Stack
+
+## Languages
+
+* Go
 * TypeScript
-* React Hook Form
+* JavaScript
 
-### Backend
+## Backend
 
 * Node.js
-* Express
-* Payload CMS
+* Express.js
+* Go Chi Router
 
-### Database
+## Databases
 
+* MySQL
 * MongoDB
 
-### Payments
+## ORM & Data Access
 
-* Stripe
-* Stripe.js
-* React Stripe.js
+* Prisma
+* Sequelize
+* Repository Pattern
 
-### Content Management
+## Authentication & Security
 
-* Payload CMS
-* Payload SEO Plugin
-* Payload Redirects Plugin
-* Payload Nested Docs
-* Payload Rich Text
+* JWT
+* bcrypt
+* OTP verification
+* Role-Based Access Control
+* Rate limiting
+* Input validation
 
-### Infrastructure
+## Validation
 
-* Docker
-* Docker Compose
-* Environment-based configuration
+* Zod
+* Go Validator
 
-## Architecture
+## Cache & Distributed Systems
 
-The project follows a full-stack architecture in which Next.js powers the customer-facing storefront while Payload CMS provides backend content and administrative functionality.
+* Redis
+* IORedis
+* Redlock
 
-MongoDB provides persistent application storage, while Stripe handles payment-related operations.
+## Background Processing
 
-This architecture separates presentation, commerce logic, content management, payments, and persistence while keeping them integrated within a unified application.
+* BullMQ
+* Redis queues
+* Worker processes
 
-## Purpose
+## Notifications
 
-The goal of this project is to demonstrate how a production-style direct-to-consumer e-commerce platform can be built using a modern JavaScript and TypeScript technology stack.
+* Nodemailer
+* Handlebars
+* SMTP
 
-It showcases experience with:
+## Logging & Observability
 
-* Full-stack web development
-* E-commerce architecture
-* Responsive frontend development
-* Headless CMS integration
-* Product and catalog management
+* Winston
+* MongoDB logging
+* Daily rotating logs
+* Correlation IDs
+* Health-check endpoints
+
+---
+
+# 🗄️ Data Layer
+
+The project uses MySQL as its primary relational database.
+
+Different services use dedicated data-access technologies appropriate to their implementation:
+
+* **Prisma** for booking-related persistence
+* **Sequelize** for hotel/property data
+* Native Go database access for Go services
+* **MongoDB** for selected logging functionality
+
+Database migrations provide version-controlled schema changes.
+
+Transactions are used for operations where data consistency is critical.
+
+---
+
+# 🚀 Scalability
+
+The microservice architecture allows different areas of the platform to scale independently.
+
+For example:
+
+* Booking workers can scale during periods of high reservation traffic.
+* Notification workers can scale when large volumes of emails are queued.
+* Property-search services can be replicated independently.
+* Authentication services can be scaled according to login traffic.
+
+Redis-backed queues and distributed locking help coordinate work across multiple application instances.
+
+---
+
+# 🔍 Reliability & Observability
+
+The platform implements several features designed to improve production reliability:
+
+* Health-check endpoints
+* Structured logging
+* Correlation IDs
+* Request validation
+* Centralized error handling
+* Database transactions
+* Idempotent operations
+* Distributed locking
+* Queue-based processing
+* Soft deletion
+* Retry-friendly architecture
+
+These features make the project more representative of a real distributed backend rather than a basic CRUD application.
+
+---
+
+# 🌍 GuestReady-Inspired Experience
+
+The project takes inspiration from platforms such as GuestReady, where accommodation booking is combined with the operational systems required to manage hospitality properties.
+
+A production version of the platform can support workflows such as:
+
+### For Guests
+
+* Search accommodations
+* Check availability
+* Make reservations
+* Manage bookings
+* Receive booking notifications
+* Review completed stays
+
+### For Property Managers
+
+* Add properties
+* Manage rooms
+* Set room availability
+* Manage pricing
+* Track bookings
+* Review guest feedback
+
+### For Administrators
+
+* Manage users
+* Manage permissions
+* Manage roles
+* Monitor properties
+* Monitor bookings
+* Moderate reviews
+* Manage platform operations
+
+---
+
+# 🎯 Project Purpose
+
+The goal of this project is to demonstrate the architecture behind a **production-style hospitality and accommodation booking platform**.
+
+Rather than concentrating only on UI replication, the project focuses heavily on backend engineering and distributed-system concepts required by real booking platforms.
+
+It demonstrates practical experience with:
+
+* Microservices architecture
+* Distributed systems
+* REST API design
+* Go backend development
+* Node.js backend development
+* TypeScript
 * Authentication
-* Database design
-* Payment processing
-* Admin dashboards
-* SEO
-* Content management
-* API integration
-* Dockerized development
-* Modern UI/UX implementation
+* Authorization
+* OTP verification
+* Role-based access control
+* Database architecture
+* Redis
+* Distributed locking
+* Message queues
+* Background processing
+* Idempotency
+* Database transactions
+* Property management
+* Booking management
+* Review systems
+* Email infrastructure
+* Logging
+* Observability
+* Error handling
+* API validation
+* Scalable service design
 
-The project is particularly focused on recreating the polished visual experience and streamlined shopping flow expected from a premium modern e-commerce brand while maintaining a scalable backend architecture.
+The result is a modular hospitality backend capable of serving as the foundation for a large-scale property-management and accommodation-booking application.
